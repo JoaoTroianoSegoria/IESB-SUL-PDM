@@ -1,0 +1,29 @@
+import "dotenv/config";
+import cors from "cors";
+import express from "express";
+import authRouter from "./routes/auth.js";
+import categoriesRouter from "./routes/categories.js";
+import transactionsRouter from "./routes/transactions.js";
+import { authMiddleware } from "./middlewares/authMiddleware.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  return res.json({ ok: true, name: "gestao-financeira-api" });
+});
+
+app.use("/auth", authRouter);
+app.use("/categories", authMiddleware, categoriesRouter);
+app.use("/transactions", authMiddleware, transactionsRouter);
+
+app.use(errorHandler);
+
+const port = process.env.PORT ?? 3000;
+
+app.listen(port, () => {
+  console.log(`API rodando em http://localhost:${port}`);
+});
